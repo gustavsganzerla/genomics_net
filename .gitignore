@@ -11,3 +11,4 @@ uploads/
 .idea/
 .vscode/
 docker-compose.override.yml
+.env
