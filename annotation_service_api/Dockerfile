@@ -4,7 +4,7 @@ FROM python:3.10-slim
 RUN apt-get update && apt-get install -y python3-pip docker.io && rm -rf /var/lib/apt/lists/*
 
 # Install Flask
-RUN pip install flask
+RUN pip install flask python-decouple
 
 # Set working directory
 WORKDIR /app

@@ -3,6 +3,7 @@ import os
 import tempfile
 import subprocess
 import uuid
+from decouple import config
 
 
 app = Flask(__name__)
@@ -11,6 +12,9 @@ app = Flask(__name__)
 def annotate():
     ###the absolute path of the file was sent here, the flask app should have access to it
     data = request.get_json(force=True)
+
+    HOST_UPLOADS_DIR = os.getenv('HOST_UPLOADS_DIR', '/app/uploads')  # host path to uploads
+    HOST_REFERENCES_DIR = os.getenv('HOST_REFERENCES_DIR', '/data/references')  # host path to references
     
 
     if not data or 'filename' not in data:
@@ -29,8 +33,8 @@ def annotate():
     prokka_cmd = [
         'docker', 'run', '--rm',
         '--platform', 'linux/amd64',
-        '-v', '/Users/gustavosganzerla/Documents/mpox_outbreak/genomics_net/annotation_service_api/uploads:/data',
-        '-v', '/Users/gustavosganzerla/Documents/mpox_outbreak/genomics_net/references:/data/references',
+        '-v', f'{HOST_UPLOADS_DIR}:/data',
+        '-v', f'{HOST_REFERENCES_DIR}:/data/references',
         'staphb/prokka:latest',
         'prokka',
         '--outdir', f'/data/output_{job_id}',

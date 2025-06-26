@@ -20,6 +20,10 @@ services:
       - ${LOCAL_UPLOADS_DIR}:/app/uploads
       - ${LOCAL_REFERENCES_DIR}:/data/references
 
+    environment:
+      - HOST_UPLOADS_DIR=${LOCAL_UPLOADS_DIR}
+      - HOST_REFERENCES_DIR=${LOCAL_REFERENCES_DIR}
+
 volumes:
   annotation_data:
 
