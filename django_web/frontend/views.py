@@ -97,7 +97,8 @@ def annotate_genome(request, filename):
         return HttpResponse(e)
     
     return render(request, 'frontend/annotation_results.html', {'files':files,
-                                                                'job_id':job_id})
+                                                                'job_id':job_id,
+                                                                'selected_reference':selected_reference})
 
 def download_annotation(request, job_id):
     ###a post is comming from the template

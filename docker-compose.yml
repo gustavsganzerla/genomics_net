@@ -18,7 +18,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${LOCAL_UPLOADS_DIR}:/app/uploads
-      - ${LOCAL_REFERENCES_FILE}:/data/references
+      - ${LOCAL_REFERENCES_DIR}:/data/references
 
 volumes:
   annotation_data:
