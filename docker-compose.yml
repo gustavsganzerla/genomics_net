@@ -1,0 +1,27 @@
+services:
+  django_web:
+    build: ./django_web
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./django_web:/app
+      - ${LOCAL_UPLOADS_DIR}:/app/uploads
+    networks:
+      - genomics_net
+
+  annotation_service_api:
+    build: ./annotation_service_api
+    ports:
+      - "5001:5000"
+    networks:
+      - genomics_net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LOCAL_UPLOADS_DIR}:/app/uploads
+      - ${LOCAL_REFERENCES_FILE}:/data/references
+
+volumes:
+  annotation_data:
+
+networks:
+  genomics_net:

@@ -1,0 +1,85 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Uploaded Genome{% endblock %}
+
+{% block content %}
+
+<h2>Uploaded genome</h2>
+<table>
+    <tbody>
+        <tr>
+            <td>Fasta header</td>
+            <td>{{header}}</td>
+        </tr>
+        <tr>
+            <td>Genome length</td>
+            <td>{{length}}</td>
+        </tr>
+        <tr>
+            <td>Proportion of A</td>
+            <td>{{a_proportion}}</td>
+        </tr>
+        <tr>
+            <td>Proportion of T</td>
+            <td>{{t_proportion}}</td>
+        </tr>
+        <tr>
+            <td>Proportion of C</td>
+            <td>{{c_proportion}}</td>
+        </tr>
+        <tr>
+            <td>Proportion of G</td>
+            <td>{{g_proportion}}</td>
+        </tr>
+        <tr>
+            <td>Proportion of N</td>
+            <td>{{n_proportion}}</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<form method="get" action="{% url 'annotate_genome' filename=filename %}">
+    <label for="reference">Select reference genome:</label>
+    <select name="reference" id="reference" class="form-select">
+        <option value="NC_003310.faa">NC_003310 (Clade I)</option>
+        <option value="NC_063383.faa">NC_063383 (Clade II)</option>
+
+    </select>
+
+    <button type="submit" class="btn btn-primary mt-3" onclick="showAnnotationModal()">
+        Run Annotation
+    </button>
+</form>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="annotationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-4 text-center">
+        <h5 class="modal-title mb-3">Annotation in Progress</h5>
+        <p>This may take around 30 seconds. Please wait...</p>
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<p><p><p>
+<a href="{% url 'home' %}">Back to Home</a>
+
+
+
+
+<script>
+    function showAnnotationModal() {
+      var modal = new bootstrap.Modal(document.getElementById('annotationModal'));
+      modal.show();
+    }
+    </script>
+    
+
+
+{% endblock %}
