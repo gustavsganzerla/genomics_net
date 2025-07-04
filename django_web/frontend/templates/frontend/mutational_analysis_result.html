@@ -1,0 +1,50 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Mutational Analysis{% endblock %}
+
+{% block content %}
+
+<h1>Results for mutation analysis</h1>
+<h2>The selected reference file was {{reference}} </h2>
+
+
+<h3>SNPs Table</h3>
+    <form method="post" action="{% url 'download_snps' %}">
+        {% csrf_token %}
+        <input type="hidden" name="snps_file" value="{{ snps_file }}">
+        <button type="submit">Download SNPs</button>
+      </form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Position Ref</th>
+            <th>Reference Base</th>
+            <th>Position Query</th>
+            <th>Query Base</th>
+            <th>Reference Name</th>
+            <th>Query Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for snp in snps_list %}
+        <tr>
+            <td>{{ snp.pos_ref }}</td>
+            <td>{{ snp.ref_base }}</td>
+            <td>{{ snp.pos_query }}</td>
+            <td>{{ snp.query_base }}</td>
+            <td>{{ snp.ref_name }}</td>
+            <td>{{ snp.query_name }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">No SNPs found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+{%endblock%}

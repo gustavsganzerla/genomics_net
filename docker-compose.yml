@@ -24,6 +24,25 @@ services:
       - HOST_UPLOADS_DIR=${LOCAL_UPLOADS_DIR}
       - HOST_REFERENCES_DIR=${LOCAL_REFERENCES_DIR}
 
+
+  mutational_service_api:
+    platform: linux/amd64
+    build: ./mutational_service_api
+    ports: 
+      - "5002:5000"
+    networks: 
+      - genomics_net
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${LOCAL_UPLOADS_DIR}:/app/uploads
+      - ${LOCAL_REFERENCES_DIR}:/data/references
+
+    environment:
+      - HOST_UPLOADS_DIR=${LOCAL_UPLOADS_DIR}
+      - HOST_REFERENCES_DIR=${LOCAL_REFERENCES_DIR}
+
+
 volumes:
   annotation_data:
 

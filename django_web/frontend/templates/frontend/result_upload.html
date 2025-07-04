@@ -39,32 +39,28 @@
     </tbody>
 </table>
 
-<form method="get" action="{% url 'annotate_genome' filename=filename %}">
-    <label for="reference">Select reference genome:</label>
-    <select name="reference" id="reference" class="form-select">
-        <option value="NC_003310.faa">NC_003310 (Clade I)</option>
-        <option value="NC_063383.faa">NC_063383 (Clade II)</option>
 
-    </select>
+<!-- select reference once -->
+<label for="reference">Select reference genome:</label>
+<select name="reference" id="reference" class="form-select">
+    <option value="NC_003310">NC_003310 (Clade I)</option>
+    <option value="NC_063383">NC_063383 (Clade II)</option>
+</select>
 
-    <button type="submit" class="btn btn-primary mt-3" onclick="showAnnotationModal()">
-        Run Annotation
-    </button>
-</form>
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="annotationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-4 text-center">
-        <h5 class="modal-title mb-3">Annotation in Progress</h5>
-        <p>This may take around 30 seconds. Please wait...</p>
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    </div>
+<!-- Run Annotation -->
+<form method="get" action="{% url 'annotate_genome' filename=filename %}" target="_blank" onsubmit="return appendReferenceAndNotify(this)">
+    <button type="submit" class="btn btn-primary mt-3">Run Annotation</button>
+  </form>
+  
+  <!-- Run Mutational Analysis -->
+  <form method="get" action="{% url 'mutation_analysis' filename=filename %}" target="_blank" onsubmit="return appendReferenceAndNotify(this)">
+    <button type="submit" class="btn btn-primary mt-3">Run Mutational Analysis</button>
+  </form>
+  
+  <!-- Notification -->
+  <div id="jobNotification" class="alert alert-info alert-dismissible fade d-none mt-3" role="alert">
+    Job has started — results will open in a new tab.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 
 <p><p><p>
@@ -74,12 +70,20 @@
 
 
 <script>
-    function showAnnotationModal() {
-      var modal = new bootstrap.Modal(document.getElementById('annotationModal'));
-      modal.show();
+    function appendReferenceAndNotify(form) {
+      const reference = document.getElementById('reference').value;
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'reference';
+      input.value = reference;
+      form.appendChild(input);
+  
+      // Show notification
+      const notification = document.getElementById('jobNotification');
+      notification.classList.remove('d-none');
+      notification.classList.add('show');
+  
+      return true;
     }
-    </script>
-    
-
-
+  </script>
 {% endblock %}

@@ -9,6 +9,7 @@ import os
 import uuid
 from Bio import SeqIO
 from io import StringIO, BytesIO
+import csv
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ def annotate_genome(request, filename):
     selected_reference = request.GET.get('reference')
 
     payload = {'filename':filename,
-               'reference':selected_reference}
+               'reference':f'{selected_reference}.faa'}
     
     try:
         response = requests.post('http://annotation_service_api:5000/annotate',
@@ -99,6 +100,27 @@ def annotate_genome(request, filename):
     return render(request, 'frontend/annotation_results.html', {'files':files,
                                                                 'job_id':job_id,
                                                                 'selected_reference':selected_reference})
+
+def mutation_analysis(request, filename):
+    selected_reference = request.GET.get('reference')
+    payload = {'filename': filename,
+               'reference':f'{selected_reference}.fasta'}
+    
+
+    response = requests.post('http://mutational_service_api:5000/mutate', json=payload)
+
+    if response.status_code != 200:
+        logger.error(f'Mutational service failed with status {response.status_code}: {response.text}')
+        return HttpResponse(f'Mutation analysis failed: {response.text}', status=500)
+
+    result = response.json()
+    snps_list = result.get('snps')
+    snps_file = result.get('snps_file') 
+    return render(request, 'frontend/mutational_analysis_result.html', {'snps_list': snps_list,
+                                                                        'reference':selected_reference,
+                                                                        'snps_file':snps_file})
+
+
 
 def download_annotation(request, job_id):
     ###a post is comming from the template
@@ -135,5 +157,42 @@ def download_annotation(request, job_id):
             response['Content-Disposition'] = 'attachment; filename="annotation_files.zip"'
             return response
 
+
+def download_snps(request):
+    ###a POST is coming from the template
+    if request.method=='POST':
+        snps_file = request.POST.get('snps_file')
+        ###the django has access to the folder in which the snps file is at
+        if os.path.exists(snps_file):
+            try:
+                with open(snps_file, 'r') as infile:
+                    response = HttpResponse(content_type='text/csv')
+                    response['Content-Disposition'] = 'attachment; filename="snps_results.csv"'
+
+                    writer = csv.writer(response)
+                    # Write header row
+                    writer.writerow(['pos_ref', 'ref_base', 'pos_query', 'query_base', 'ref_name', 'query_name'])
+
+                    for line in infile:
+                        line = line.strip()
+                        if not line or line.startswith(('=', '/', 'NUCMER', '[')):
+                            continue
+
+                        fields = line.split()
+                        if len(fields) >= 8:
+                            writer.writerow([
+                                fields[0],  # pos_ref
+                                fields[1],  # ref_base
+                                fields[2],  # pos_query
+                                fields[3],  # query_base
+                                fields[-2],
+                                fields[-1]
+                            ])
+
+                    return response
+
+            except FileNotFoundError:
+                return HttpResponse("SNPs file not found.", status=404)
+
+    return HttpResponse("Invalid request method.", status=405)
         
-    
